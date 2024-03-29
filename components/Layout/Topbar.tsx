@@ -25,7 +25,7 @@ const Topbar = () => {
           <Link
             href={item.url}
             key={item.id}
-            className={`flex gap-4 text-body-medium ${pathname === item.url ? "text-amber-300" : ""}`}
+            className={`flex gap-4 text-body-medium ${pathname === item.url ? "text-blue-400" : ""}`}
           >
             <p>{item.label}</p>
           </Link>

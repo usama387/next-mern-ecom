@@ -14,7 +14,7 @@ const Sidebar = () => {
   const pathname = usePathname();
 
   return (
-    <div className="h-screen left-0 top-0 sticky p-10 flex flex-col gap-16 bg-blue-2 shadow-lg max-lg:hidden text-amber-100">
+    <div className="h-screen left-0 top-0 sticky p-10 flex flex-col gap-16 bg-blue-2 shadow-lg max-lg:hidden">
       <Image src="/logo.png" alt="logo" width={80} height={70} />
 
       <div className="flex flex-col gap-12">
@@ -22,7 +22,7 @@ const Sidebar = () => {
           <Link
             href={item.url}
             key={item.id}
-            className={`flex gap-4 text-body-medium ${pathname === item.url ? "text-amber-300" : ""}`}
+            className={`flex gap-4 text-body-medium ${pathname === item.url ? "text-blue-400" : ""}`}
           >
             {item.icon}
             <p>{item.label}</p>
