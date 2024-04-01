@@ -1,6 +1,6 @@
 "use client";
 // Global import
-import React from "react";
+import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,7 +20,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import ImageUpload from "../CustomUi/ImageUpload";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import Delete from "../CustomUi/Delete";
 
 const formSchema = z.object({
   title: z.string().min(2).max(20),
@@ -28,30 +30,78 @@ const formSchema = z.object({
   image: z.string(),
 });
 
-const CollectionForm = () => {
+interface Props {
+  initialData?: collectionType | null;
+}
+
+const CollectionForm = ({ initialData }: Props) => {
   // to direct the user on collections page after pressing discard button
   const router = useRouter();
 
-  // defining my form
+  // to manage loading state to submit function
+  const [loading, setLoading] = useState(false);
+
+  // 1. defining my form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      image: "",
-    },
+    defaultValues: initialData
+      ? initialData
+      : {
+          title: "",
+          description: "",
+          image: "",
+        },
   });
 
-  // 2. Define a submit handler.
+  //preventing reload or data loss on enter
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement> | React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
+  }
+  // 2. Define a submit handler which takes values as input from the downward form fields passes it to the POST rest api to create a new collection.
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    try {
+      setLoading(true);
+
+      const url = initialData
+        ? `/api/collections/${initialData._id}`
+        : "/api/collections";
+
+      // fetching POST api of collections
+      const response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        setLoading(false);
+
+        // if the initial data updated otherwise created
+        toast.success(`Collection ${initialData ? "updated" : "created"}`);
+        window.location.href = "/collections";
+        router.push("/collections");
+      }
+    } catch (error) {
+      console.log("[collections_POST]", error);
+      toast.error("Api failed or something went wrong");
+    }
   };
 
   return (
     <div className="p-10">
-      <p className="text-heading2-bold">Add Collection</p>
+      {/* Ternary operator for deciding update or add collection */}
+      {initialData ? (
+        <div className="flex justify-between items-center">
+          <p className="text-heading2-bold">Edit Collection</p>
+          <Delete id={initialData._id} />
+        </div>
+      ) : (
+        <p className="text-heading2-bold">Add Collection</p>
+      )}
+
       <Separator className="mt-4 mb-7 bg-grey-1" />
-      
+
       {/* Form component has 3 fields for uploading title, description and images using cloudinary package */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -62,7 +112,7 @@ const CollectionForm = () => {
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Title" {...field} />
+                  <Input placeholder="Title" {...field} onKeyDown={handleKeyPress}/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -75,7 +125,7 @@ const CollectionForm = () => {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Description" {...field} rows={5} />
+                  <Textarea placeholder="Description" {...field} rows={5} onKeyDown={handleKeyPress}/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -99,7 +149,11 @@ const CollectionForm = () => {
             )}
           />
           <div className="flex gap-10">
-            <Button type="submit" className="bg-blue-1 text-white">
+            <Button
+              type="submit"
+              className="bg-blue-1 text-white"
+              onClick={() => router.push("/collections")}
+            >
               Submit
             </Button>
             <Button
