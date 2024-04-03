@@ -20,9 +20,10 @@ import toast from "react-hot-toast";
 
 interface DeleteProps {
   id: string;
+  item: string;
 }
 
-const Delete = ({ id }: DeleteProps) => {
+const Delete = ({ item, id }: DeleteProps) => {
   // managing state for api loading
   const [loading, setLoading] = useState(false);
 
@@ -31,16 +32,19 @@ const Delete = ({ id }: DeleteProps) => {
     try {
       setLoading(true);
 
-      // awaiting the api response
-      const response = await fetch(`/api/collections/${id}`, {
+      // if the delete prop has item from product or category then we need to send a different api request and this method is used because this component is a reusable component used by both product and collections to perform deletion
+      const itemType = item === "product" ? "products" : "collections";
+
+      // awaiting the api response taking itemType to decide which model to perform delete operation on
+      const response = await fetch(`/api/${itemType}/${id}`, {
         method: "DELETE",
       });
 
-      // page will be refreshed when the response is ok
+      // page will be refreshed when the response is ok based on itmType
       if (response.ok) {
         setLoading(false);
-        window.location.href = "/collections";
-        toast.success("Collection deleted");
+        window.location.href = `/${itemType}`;
+        toast.success(`${item} deleted`);
       }
     } catch (error) {
       toast.error("An error occurred please try again");
@@ -57,11 +61,11 @@ const Delete = ({ id }: DeleteProps) => {
       <AlertDialogContent className="bg-blue-900 text-white">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-white">
-            Are you sure to delete this collection ?
+            Are you sure to delete this {item} ?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this
-            collection from the database.
+            This action cannot be undone. This will permanently delete this 
+             {item} from the database.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

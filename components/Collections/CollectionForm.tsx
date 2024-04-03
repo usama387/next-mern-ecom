@@ -20,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import ImageUpload from "../CustomUi/ImageUpload";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Delete from "../CustomUi/Delete";
 
@@ -54,11 +54,15 @@ const CollectionForm = ({ initialData }: Props) => {
   });
 
   //preventing reload or data loss on enter
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement> | React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyPress = (
+    e:
+      | React.KeyboardEvent<HTMLInputElement>
+      | React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
     if (e.key === "Enter") {
       e.preventDefault();
     }
-  }
+  };
   // 2. Define a submit handler which takes values as input from the downward form fields passes it to the POST rest api to create a new collection.
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -90,11 +94,13 @@ const CollectionForm = ({ initialData }: Props) => {
 
   return (
     <div className="p-10">
-      {/* Ternary operator for deciding update or add collection */}
+      {/* Ternary operator for deciding update or add product and initialData represent the singleCollection page details coming from there as prop*/}
       {initialData ? (
         <div className="flex justify-between items-center">
           <p className="text-heading2-bold">Edit Collection</p>
-          <Delete id={initialData._id} />
+
+          {/* item helps delete component to decide fire delete api on either products or collections in */}
+          <Delete id={initialData._id} item="collection" />
         </div>
       ) : (
         <p className="text-heading2-bold">Add Collection</p>
@@ -112,7 +118,11 @@ const CollectionForm = ({ initialData }: Props) => {
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Title" {...field} onKeyDown={handleKeyPress}/>
+                  <Input
+                    placeholder="Title"
+                    {...field}
+                    onKeyDown={handleKeyPress}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -125,7 +135,12 @@ const CollectionForm = ({ initialData }: Props) => {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Description" {...field} rows={5} onKeyDown={handleKeyPress}/>
+                  <Textarea
+                    placeholder="Description"
+                    {...field}
+                    rows={5}
+                    onKeyDown={handleKeyPress}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
