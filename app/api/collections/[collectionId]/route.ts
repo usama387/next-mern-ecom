@@ -1,5 +1,6 @@
 import { connectToDb } from "@/lib/connectToDb";
 import Collection from "@/lib/models/Collection";
+import Product from "@/lib/models/Product";
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -101,6 +102,12 @@ export const DELETE = async (
 
     // query that deletes the Collection taking its id
     await Collection.findByIdAndDelete(params.collectionId);
+
+    // Relation between products and collections when a collection is deleted using this api the following function updates the product where this collection was used
+    await Product.updateMany(
+      { collections: params.collectionId },
+      { $pull: { collections: params.collectionId } }
+    );
 
     // now returning the response
     return new NextResponse("Collection deleted", { status: 500 });

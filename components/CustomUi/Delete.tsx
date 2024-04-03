@@ -64,8 +64,7 @@ const Delete = ({ item, id }: DeleteProps) => {
             Are you sure to delete this {item} ?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this 
-             {item} from the database.
+            This action cannot be undone. This will permanently delete this{item}.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

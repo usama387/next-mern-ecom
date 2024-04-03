@@ -2,6 +2,7 @@ import { connectToDb } from "@/lib/connectToDb";
 import Collection from "@/lib/models/Collection";
 import Product from "@/lib/models/Product";
 import { auth } from "@clerk/nextjs";
+import { cp } from "fs";
 import { NextRequest, NextResponse } from "next/server";
 
 // this rest api posts/creates a product in the db
@@ -55,6 +56,17 @@ export const POST = async (request: NextRequest) => {
 
     // saving it in the db
     await newProduct.save();
+    
+    // POST api relation between collection and products when i add a collection while adding a product it updates the collections page by adding the product created using this api 
+    if (collections) {
+      for (const collectionId of collections) {
+        const collection = await Collection.findById(collectionId);
+        if (collection) {
+          collection.products.push(newProduct._id);
+          await collection.save();
+        }
+      }
+    }
 
     // returning response once user is saved
     return NextResponse.json(newProduct, { status: 200 });
