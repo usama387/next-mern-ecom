@@ -6,33 +6,31 @@ import { NextRequest, NextResponse } from "next/server";
 
 // This rest api fetches single product taking as an input
 export const GET = async (
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: { productId: string } }
 ) => {
   try {
     await connectToDb();
 
-    // this query finds the collection taking its id
     const product = await Product.findById(params.productId).populate({
       path: "collections",
       model: Collection,
     });
 
-    // response when the product does not exist
     if (!product) {
+      console.log("Product not found.");
       return new NextResponse(
-        JSON.stringify({ message: "Unable to find this product" }),
-        {
-          status: 500,
-        }
+        JSON.stringify({ message: "Product not found" }),
+        { status: 404 }
       );
     }
 
-    // response if the product exists
-    return NextResponse.json(product, { status: 200 });
-  } catch (error) {
-    console.log("products_GET", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return new NextResponse(JSON.stringify(product), {
+      status: 200,
+    });
+  } catch (err) {
+    console.log("[productId_GET]", err);
+    return new NextResponse("Internal error", { status: 500 });
   }
 };
 
@@ -147,13 +145,13 @@ export const DELETE = async (
   try {
     // checking user
     const { userId } = auth();
-    
+
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-   
+
     await connectToDb();
-     
+
     // query to find product
     const product = await Product.findById(params.productId);
 
@@ -163,7 +161,7 @@ export const DELETE = async (
         { status: 404 }
       );
     }
-    
+
     // query to delete product with id
     await Product.findByIdAndDelete(product._id);
 
@@ -175,7 +173,7 @@ export const DELETE = async (
         })
       )
     );
-     
+
     // response when product is deleted
     return new NextResponse(JSON.stringify({ message: "Product deleted" }), {
       status: 200,

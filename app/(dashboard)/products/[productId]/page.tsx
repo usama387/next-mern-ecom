@@ -27,8 +27,9 @@ const SingleProductPage = ({ params }: { params: { productId: string } }) => {
   };
 
   useEffect(() => {
-    getProductDetails();
-  });
+    getProductDetails()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return isLoading ? <Loader /> : <div>
     <ProductForm initialData={productDetails} />

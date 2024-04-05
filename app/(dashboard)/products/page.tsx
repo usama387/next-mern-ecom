@@ -18,6 +18,7 @@ const ProductsPage = () => {
     try {
       const response = await fetch("/api/products", {
         method: "GET",
+        cache: "no-store", // Disable caching
       });
 
       const data = await response.json();

@@ -45,7 +45,7 @@ interface ProductFormProps {
   initialData?: productType | null;
 }
 
-const ProductForm = ({ initialData }: ProductFormProps) => {
+const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
   // to direct the user on collections page after pressing discard button
   const router = useRouter();
 
@@ -53,7 +53,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
   const [loading, setLoading] = useState(true);
 
   // managing state for collections to be selected
-  const [collections, setCollections] = useState<collectionType[]>([]) as any;
+  const [collections, setCollections] = useState<collectionType[]>([]);
 
   const getCollections = async () => {
     try {

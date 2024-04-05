@@ -19,6 +19,7 @@ const CollectionsPage = () => {
     try {
       const response = await fetch("/api/collections", {
         method: "GET",
+        cache: "no-store", // Disable caching
       });
 
       //converting response in JSON
